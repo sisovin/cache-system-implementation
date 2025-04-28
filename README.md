@@ -1,2 +1,1 @@
-# cache-system-implementation
-A repository for implementing a cache system
+This repository is empty. Any task executed on it should be considered a new capability and needs to be created.
