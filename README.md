@@ -89,3 +89,22 @@ We welcome contributions to improve and expand this project. Feel free to submit
 
 ## License
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+## Architecture Diagram
+![Architecture Diagram](path/to/architecture-diagram.png)
+
+## Cache Strategies
+### Cache-Aside
+In the cache-aside strategy, the application code is responsible for loading data into the cache. When the application needs to read data, it first checks the cache. If the data is not found in the cache (a cache miss), the application loads the data from the database and then stores it in the cache for future requests.
+
+### Write-Through
+In the write-through strategy, data is written to the cache and the database simultaneously. This ensures that the cache is always up-to-date with the latest data. Write-through caching can help reduce the load on the database by serving read requests directly from the cache.
+
+### Write-Behind
+In the write-behind strategy, data is first written to the cache and then asynchronously written to the database. This can improve write performance by allowing the application to continue processing without waiting for the database write to complete. However, it introduces a risk of data loss if the cache is not properly synchronized with the database.
+
+### Read-Through
+In the read-through strategy, the cache is responsible for loading data from the database when a cache miss occurs. The application interacts with the cache, and the cache transparently handles loading data from the database as needed. This can simplify application code by centralizing cache management.
+
+### Cache Invalidation
+Cache invalidation is the process of removing or updating stale data in the cache. There are several strategies for cache invalidation, including time-based expiration, event-based invalidation, and manual invalidation. Proper cache invalidation is crucial to ensure data consistency between the cache and the underlying data store.

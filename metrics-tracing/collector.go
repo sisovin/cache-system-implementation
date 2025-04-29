@@ -1,0 +1,57 @@
+package metrics
+
+import (
+	"context"
+	"time"
+
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/metric"
+	"go.opentelemetry.io/otel/trace"
+)
+
+var (
+	cacheHits   metric.Int64Counter
+	cacheMisses metric.Int64Counter
+	tracer      trace.Tracer
+)
+
+func init() {
+	meter := otel.Meter("cache-system")
+	cacheHits = meter.NewInt64Counter("cache_hits", metric.WithDescription("Number of cache hits"))
+	cacheMisses = meter.NewInt64Counter("cache_misses", metric.WithDescription("Number of cache misses"))
+	tracer = otel.Tracer("cache-system")
+}
+
+func RecordCacheHit(ctx context.Context) {
+	cacheHits.Add(ctx, 1)
+}
+
+func RecordCacheMiss(ctx context.Context) {
+	cacheMisses.Add(ctx, 1)
+}
+
+func StartCacheOperationSpan(ctx context.Context, operationName string) (context.Context, trace.Span) {
+	ctx, span := tracer.Start(ctx, operationName)
+	span.SetAttributes(attribute.String("component", "cache"))
+	return ctx, span
+}
+
+func EndCacheOperationSpan(span trace.Span) {
+	span.End()
+}
+
+func RecordCacheOperation(ctx context.Context, operationName string, operation func() error) error {
+	ctx, span := StartCacheOperationSpan(ctx, operationName)
+	defer EndCacheOperationSpan(span)
+
+	err := operation()
+	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(trace.StatusCodeError, err.Error())
+	} else {
+		span.SetStatus(trace.StatusCodeOk, "Success")
+	}
+
+	return err
+}

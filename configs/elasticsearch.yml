@@ -1,0 +1,10 @@
+# Elasticsearch configuration
+
+# Configure JVM heap
+jvm.options:
+  -Xms1g
+  -Xmx1g
+
+# Enable query cache
+indices.queries.cache.size: 10%
+indices.queries.cache.count: 10000
